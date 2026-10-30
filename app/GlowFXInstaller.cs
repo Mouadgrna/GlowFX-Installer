@@ -29,15 +29,15 @@ using System.Windows.Media.Imaging;
 
 [assembly: AssemblyTitle("GlowFX Installer")]
 [assembly: AssemblyProduct("GlowFX Installer")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.0")]
+[assembly: AssemblyFileVersion("1.0.1.0")]
 
 namespace GlowFX
 {
     static class Config
     {
         // Bump this when publishing a new installer build (the publish script reads it).
-        public const string AppVersion = "1.0.0";
+        public const string AppVersion = "1.0.1";
         public const string DefaultCatalog = "https://raw.githubusercontent.com/Mouadgrna/GlowFX-Installer/main/catalog.json";
     }
 
@@ -412,7 +412,12 @@ namespace GlowFX
                     await UpdateSelf();               // swaps the .exe and relaunches
                     return;
                 }
-                if (AutoInstallId != null)
+                if (AutoInstallId != null && AutoInstallId.StartsWith("uninstall:"))
+                {
+                    var target = items.FirstOrDefault(i => string.Equals(i.Id, AutoInstallId.Substring(10), StringComparison.OrdinalIgnoreCase));
+                    if (target != null) await Uninstall(target);
+                }
+                else if (AutoInstallId != null)
                 {
                     foreach (var i in items) i.IsChecked = string.Equals(i.Id, AutoInstallId, StringComparison.OrdinalIgnoreCase);
                     await InstallSelected();
@@ -617,19 +622,37 @@ namespace GlowFX
             if (busy) return;
             var agent = Adobe.FindInstaller();
             if (agent == null) return;
-            if (MessageBox.Show(window, "Uninstall " + item.Name + " from Photoshop?", "GlowFX Installer",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+            if (ScreenshotPath == null && MessageBox.Show(window,
+                "Are you sure you want to uninstall " + item.Name + "?\n\n" +
+                "It will be removed from Photoshop's Plugins menu. Your PSD files are not affected: " +
+                "glow layers you already made stay as they are.\n\nYou can reinstall it here any time.",
+                "Uninstall " + item.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) != MessageBoxResult.Yes) return;
             if (!HandlePhotoshopOpen("uninstall")) return;
             SetBusy(true);
             item.ProgressText = "Uninstalling…";
+            Status("Uninstalling " + item.Name + "…");
+            // Adobe's own installer does the removal, so Photoshop's plugin registry stays consistent
             var res = await Adobe.RunAgent(agent, "/remove \"" + (item.InstalledName ?? item.Name) + "\"");
             item.ProgressText = null;
             SetBusy(false);
-            if (res.Key) { item.InstalledVersion = null; Status(item.Name + " was uninstalled."); }
+
+            // check what Photoshop actually has now
+            KeyValuePair<string, string> still;
+            var gone = !Adobe.InstalledPlugins().TryGetValue(item.Id, out still);
+            if (res.Key && gone)
+            {
+                item.InstalledVersion = null;
+                item.InstalledName = null;
+                Status(item.Name + " was uninstalled." + (Adobe.PhotoshopRunning() ? " Restart Photoshop to finish." : ""));
+            }
             else
             {
+                if (!gone) { item.InstalledName = still.Key; item.InstalledVersion = still.Value; }
                 Status("Uninstall failed.");
-                MessageBox.Show(window, "Could not uninstall " + item.Name + ":\n" + FirstLine(res.Value), "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Warning);
+                if (ScreenshotPath == null)
+                    MessageBox.Show(window, "Could not uninstall " + item.Name + ":\n" + FirstLine(res.Value) +
+                        "\n\nYou can also remove it from the Creative Cloud app (Stock & Marketplace > Plugins).\nDetails: " + Log.FilePath,
+                        "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
