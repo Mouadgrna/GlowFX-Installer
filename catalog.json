@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "GlowFX",
-  "updated": "2026-10-30T12:37:54.225Z",
+  "updated": "2026-10-30T13:16:31.946Z",
   "installer": {
     "version": "1.0.2",
     "url": "installer/GlowFXInstaller.exe",
@@ -12,15 +12,21 @@
     {
       "id": "com.mouadgrna.hologlow",
       "name": "Holo Glow",
-      "version": "1.2.3",
+      "version": "1.2.4",
       "description": "One-click procedural holographic glow for items and logos: rainbow rays, lens flares, star sparkles and halo rings that follow the item's shape.",
       "minPhotoshop": "25.0.0",
-      "package": "plugins/hologlow/HoloGlow-1.2.3.ccx",
-      "sha256": "2293cd99bf9e507c1d5f63d1c026369b5d0787ac4a094660b9da029275494f18",
-      "size": 33297,
+      "package": "plugins/hologlow/HoloGlow-1.2.4.ccx",
+      "sha256": "78ae987a3f348f54b0dbec87afd2ac8bb1079785332e996591ae01dbafaae24d",
+      "size": 33550,
       "icon": "plugins/hologlow/icon.png",
-      "sourceHash": "95a652dd57e789a38415fc4190f4f53f41d38eb33221745e198e8e30d4213eed",
+      "sourceHash": "8898496c4d853e6afbdcc013402ba9719360cea415885c904232dab7fb3755f6",
       "changes": [
+        {
+          "version": "1.2.4",
+          "notes": [
+            "🎲 Shuffle now changes the colour too: a different palette and a slight hue shift each time."
+          ]
+        },
         {
           "version": "1.2.3",
           "notes": [
