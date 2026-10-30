@@ -133,6 +133,10 @@
                     </StackPanel>
                     <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
                     <TextBlock Text="{Binding VersionLine}" FontSize="11" Foreground="#73737F" Margin="0,6,0,0"/>
+                    <Border Visibility="{Binding WhatsNewVisibility}" Background="#1B2333" BorderBrush="#2A3A5C" BorderThickness="1"
+                            CornerRadius="6" Padding="10,8" Margin="0,10,0,0">
+                      <TextBlock Text="{Binding WhatsNew}" TextWrapping="Wrap" FontSize="12" Foreground="#C5D3EE" LineHeight="19"/>
+                    </Border>
                     <TextBlock Text="{Binding ProgressText}" FontSize="12" Foreground="#8FB4FF" Margin="0,4,0,0"
                                Visibility="{Binding ProgressVisibility}"/>
                   </StackPanel>

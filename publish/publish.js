@@ -67,6 +67,19 @@ function contentHash(dir, filter) {
   return h.digest('hex');
 }
 
+/** Reads the plugin's changelog.js (newest first) up to the published version; keeps the last 10 versions. */
+function readChangelog(src, version) {
+  const file = path.join(src, 'changelog.js');
+  if (!fs.existsSync(file)) return [];
+  delete require.cache[require.resolve(file)];
+  const list = require(file);
+  if (!Array.isArray(list)) return [];
+  const num = (v) => String(v).split('.').map((n) => parseInt(n, 10) || 0);
+  const le = (a, b) => { const x = num(a), y = num(b); for (let i = 0; i < 4; i++) { if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) < (y[i] || 0); } return true; };
+  return list.filter((e) => e && e.version && Array.isArray(e.notes) && le(e.version, version))
+    .slice(0, 10).map((e) => ({ version: String(e.version), notes: e.notes.map(String) }));
+}
+
 function main() {
   const config = readJSON(path.join(__dirname, 'plugins.json'));
   const catalogFile = path.join(repo, 'catalog.json');
@@ -101,7 +114,11 @@ function main() {
       size: fs.statSync(path.join(repo, pkg)).size,
       icon,
       sourceHash: contentHash(src),
+      changes: readChangelog(src, manifest.version),
     };
+    if (!item.changes.some((c) => c.version === item.version)) {
+      warnings.push(`${item.name}: no notes for ${item.version}. Add them to changelog.js so users can see what changed.`);
+    }
     const old = (previous.plugins || []).find((p) => p.id === item.id);
     if (old && old.version === item.version && old.sourceHash && old.sourceHash !== item.sourceHash) {
       warnings.push(`${item.name}: files changed but the version is still ${item.version}. ` +

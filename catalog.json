@@ -1,25 +1,68 @@
 {
   "schema": 1,
   "name": "GlowFX",
-  "updated": "2026-10-30T12:09:35.882Z",
+  "updated": "2026-10-30T12:37:54.225Z",
   "installer": {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "url": "installer/GlowFXInstaller.exe",
-    "sha256": "766781026cbc810d763a4b418a4e987fe83f606a2bce8c39a3952fe7f4731593",
-    "sourceHash": "9462446f36666c5d1f4e6071a6591b83ec7acc3c20488472ca6f8ea2fa6db551"
+    "sha256": "97931a0c13afee2130255d399cbdd294b30cf1c0efe4fc2a58d75dcc8c472120",
+    "sourceHash": "159033b53ef0beefdfbe31a8034faa7bbd7ada2dda2a2ffd4bb1bdee0d5c8f94"
   },
   "plugins": [
     {
       "id": "com.mouadgrna.hologlow",
       "name": "Holo Glow",
-      "version": "1.2.1",
+      "version": "1.2.3",
       "description": "One-click procedural holographic glow for items and logos: rainbow rays, lens flares, star sparkles and halo rings that follow the item's shape.",
       "minPhotoshop": "25.0.0",
-      "package": "plugins/hologlow/HoloGlow-1.2.1.ccx",
-      "sha256": "ca1f3cb69e58b50f1b4a3b726dcb1dbbb1c06a71ecd953c399116b39b3ec3119",
-      "size": 28609,
+      "package": "plugins/hologlow/HoloGlow-1.2.3.ccx",
+      "sha256": "2293cd99bf9e507c1d5f63d1c026369b5d0787ac4a094660b9da029275494f18",
+      "size": 33297,
       "icon": "plugins/hologlow/icon.png",
-      "sourceHash": "e4c843fe2cb6ec443be6e249d1b024863548e89b0145eaf13e189fab1cb6ce19"
+      "sourceHash": "95a652dd57e789a38415fc4190f4f53f41d38eb33221745e198e8e30d4213eed",
+      "changes": [
+        {
+          "version": "1.2.3",
+          "notes": [
+            "The ✨ plugin icon now shows up in Photoshop."
+          ]
+        },
+        {
+          "version": "1.2.2",
+          "notes": [
+            "The panel now shows the plugin version at the bottom.",
+            "A \"What's new\" box appears the first time you open the panel after an update."
+          ]
+        },
+        {
+          "version": "1.2.1",
+          "notes": [
+            "Radius slider now runs 1–100 and starts small (10), so the glow sits close to the item.",
+            "The panel scrolls, so all Advanced settings are reachable."
+          ]
+        },
+        {
+          "version": "1.2.0",
+          "notes": [
+            "New Glow type picker: Holo Burst, Lens Flare, Star Sparkle, Prism Bloom, Pearl Haze, Rainbow Halo.",
+            "Rays now follow the item's shape (new Shape follow slider).",
+            "New gray ✨ panel icon for light and dark themes."
+          ]
+        },
+        {
+          "version": "1.1.0",
+          "notes": [
+            "Soft rainbow lens-halo ring around the item, with Ring size and width controls.",
+            "Fixed thin transparent lines that could appear in the glow."
+          ]
+        },
+        {
+          "version": "1.0.0",
+          "notes": [
+            "First release: one-click procedural holographic glow with radius, intensity and colour controls."
+          ]
+        }
+      ]
     }
   ]
 }

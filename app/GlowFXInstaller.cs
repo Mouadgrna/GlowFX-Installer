@@ -29,15 +29,15 @@ using System.Windows.Media.Imaging;
 
 [assembly: AssemblyTitle("GlowFX Installer")]
 [assembly: AssemblyProduct("GlowFX Installer")]
-[assembly: AssemblyVersion("1.0.1.0")]
-[assembly: AssemblyFileVersion("1.0.1.0")]
+[assembly: AssemblyVersion("1.0.2.0")]
+[assembly: AssemblyFileVersion("1.0.2.0")]
 
 namespace GlowFX
 {
     static class Config
     {
         // Bump this when publishing a new installer build (the publish script reads it).
-        public const string AppVersion = "1.0.1";
+        public const string AppVersion = "1.0.2";
         public const string DefaultCatalog = "https://raw.githubusercontent.com/Mouadgrna/GlowFX-Installer/main/catalog.json";
     }
 
@@ -56,6 +56,46 @@ namespace GlowFX
         public string IconUrl { get; set; }
         public string MinPhotoshop { get; set; }
         public string InstalledName { get; set; }
+
+        // newest first: (version, notes)
+        public List<KeyValuePair<string, List<string>>> Changes = new List<KeyValuePair<string, List<string>>>();
+
+        string justUpdatedFrom;
+        /// <summary>Set after an update in this session, so the card keeps showing what changed.</summary>
+        public string JustUpdatedFrom { get { return justUpdatedFrom; } set { justUpdatedFrom = value; Refresh(); } }
+
+        /// <summary>Bullet list of changes after version `since` (all shown versions when since is null).</summary>
+        public string NotesSince(string since, int maxLines)
+        {
+            var lines = new List<string>();
+            var entries = Changes.Where(c => Versions.Compare(c.Key, Version) <= 0 && (since == null || Versions.Compare(c.Key, since) > 0)).ToList();
+            foreach (var c in entries)
+            {
+                if (entries.Count > 1) lines.Add("v" + c.Key);
+                foreach (var n in c.Value) lines.Add("•  " + n);
+            }
+            if (lines.Count > maxLines) { lines = lines.Take(maxLines).ToList(); lines.Add("…"); }
+            return string.Join("\n", lines);
+        }
+
+        public string WhatsNew
+        {
+            get
+            {
+                if (justUpdatedFrom != null)
+                {
+                    var notes = NotesSince(justUpdatedFrom, 10);
+                    return "✓ Just updated from v" + justUpdatedFrom + (notes.Length > 0 ? ". What changed:\n" + notes : ".");
+                }
+                if (HasUpdate)
+                {
+                    var notes = NotesSince(installedVersion, 10);
+                    return notes.Length > 0 ? "What's new in this update:\n" + notes : "";
+                }
+                return "";
+            }
+        }
+        public Visibility WhatsNewVisibility { get { return string.IsNullOrEmpty(WhatsNew) ? Visibility.Collapsed : Visibility.Visible; } }
 
         string installedVersion;
         public string InstalledVersion { get { return installedVersion; } set { installedVersion = value; Refresh(); } }
@@ -95,7 +135,7 @@ namespace GlowFX
 
         public void Refresh()
         {
-            foreach (var p in new[] { "InstalledVersion", "StatusKind", "StatusText", "CanSelect", "UninstallVisibility", "VersionLine" }) Notify(p);
+            foreach (var p in new[] { "InstalledVersion", "StatusKind", "StatusText", "CanSelect", "UninstallVisibility", "VersionLine", "WhatsNew", "WhatsNewVisibility" }) Notify(p);
             if (UpToDate && isChecked) IsChecked = false;
         }
     }
@@ -274,7 +314,7 @@ namespace GlowFX
                 {
                     var d = o as Dictionary<string, object>;
                     if (d == null || string.IsNullOrEmpty(Json.Str(d, "id"))) continue;
-                    cat.Plugins.Add(new PluginItem
+                    var item = new PluginItem
                     {
                         Id = Json.Str(d, "id"),
                         Name = Json.Str(d, "name") ?? Json.Str(d, "id"),
@@ -284,7 +324,20 @@ namespace GlowFX
                         Sha256 = (Json.Str(d, "sha256") ?? "").ToLowerInvariant(),
                         IconUrl = cat.Resolve(Json.Str(d, "icon")),
                         MinPhotoshop = Json.Str(d, "minPhotoshop"),
-                    });
+                    };
+                    var changes = d.ContainsKey("changes") ? d["changes"] as object[] : null;
+                    if (changes != null)
+                    {
+                        foreach (var co in changes)
+                        {
+                            var cd = co as Dictionary<string, object>;
+                            var notes = cd != null && cd.ContainsKey("notes") ? cd["notes"] as object[] : null;
+                            if (cd == null || notes == null) continue;
+                            item.Changes.Add(new KeyValuePair<string, List<string>>(Json.Str(cd, "version"),
+                                notes.Select(n => Convert.ToString(n)).ToList()));
+                        }
+                    }
+                    cat.Plugins.Add(item);
                 }
             }
             return cat;
@@ -552,6 +605,7 @@ namespace GlowFX
             SetBusy(true);
             int ok = 0;
             var failures = new List<string>();
+            var summary = new List<string>();
             for (int k = 0; k < todo.Count; k++)
             {
                 var item = todo[k];
@@ -578,8 +632,16 @@ namespace GlowFX
                     var res = await Adobe.RunAgent(agent, "/install \"" + file + "\"");
                     if (!res.Key) throw new Exception(FirstLine(res.Value));
 
+                    var from = item.InstalledVersion;
                     item.InstalledName = item.Name;
                     item.InstalledVersion = item.Version;
+                    if (from != null && Versions.Compare(from, item.Version) < 0)
+                    {
+                        item.JustUpdatedFrom = from;
+                        var notes = item.NotesSince(from, 8);
+                        summary.Add(item.Name + "  v" + from + " → v" + item.Version + (notes.Length > 0 ? "\n" + notes : ""));
+                    }
+                    else summary.Add(item.Name + " v" + item.Version + " installed");
                     item.IsChecked = false;
                     item.ProgressText = null;
                     progress.Value = baseProgress + span;
@@ -606,8 +668,10 @@ namespace GlowFX
             if (failures.Count == 0)
             {
                 Status("Done! " + ok + (ok == 1 ? " plugin" : " plugins") + " installed. Open Photoshop > Plugins menu.");
-                if (Adobe.PhotoshopRunning() && ScreenshotPath == null)
-                    MessageBox.Show(window, "Installed. Restart Photoshop to load the new version.", "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (ScreenshotPath == null)
+                    MessageBox.Show(window, string.Join("\n\n", summary) +
+                        (Adobe.PhotoshopRunning() ? "\n\nRestart Photoshop to load the new version." : "\n\nOpen Photoshop > Plugins to use it."),
+                        "Done", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
