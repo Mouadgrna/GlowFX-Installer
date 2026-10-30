@@ -1,26 +1,33 @@
 {
   "schema": 1,
   "name": "GlowFX",
-  "updated": "2026-10-30T13:16:31.946Z",
+  "updated": "2026-10-30T13:20:19.179Z",
   "installer": {
-    "version": "1.0.2",
-    "url": "installer/GlowFXInstaller.exe",
-    "sha256": "97931a0c13afee2130255d399cbdd294b30cf1c0efe4fc2a58d75dcc8c472120",
-    "sourceHash": "159033b53ef0beefdfbe31a8034faa7bbd7ada2dda2a2ffd4bb1bdee0d5c8f94"
+    "version": "1.1.0",
+    "url": "installer/GlowFX.exe",
+    "sha256": "b258e564be1914e0f4d97185d402dc86a2a74e1d9b96a866dd72357c7d868675",
+    "sourceHash": "b3115cc68f43b971fca2600c43bfafbdd11633753c0c177baeed34c824aafb49"
   },
   "plugins": [
     {
       "id": "com.mouadgrna.hologlow",
-      "name": "Holo Glow",
-      "version": "1.2.4",
+      "name": "GlowFX",
+      "version": "1.3.0",
       "description": "One-click procedural holographic glow for items and logos: rainbow rays, lens flares, star sparkles and halo rings that follow the item's shape.",
       "minPhotoshop": "25.0.0",
-      "package": "plugins/hologlow/HoloGlow-1.2.4.ccx",
-      "sha256": "78ae987a3f348f54b0dbec87afd2ac8bb1079785332e996591ae01dbafaae24d",
-      "size": 33550,
+      "package": "plugins/hologlow/GlowFX-1.3.0.ccx",
+      "sha256": "6ac8bd8282c2517bad267456487760fef20fab623afba0cc081faf64e73bcf3a",
+      "size": 33809,
       "icon": "plugins/hologlow/icon.png",
-      "sourceHash": "8898496c4d853e6afbdcc013402ba9719360cea415885c904232dab7fb3755f6",
+      "sourceHash": "69171d2a53b70d450671bd6ed152a44c308a6c10dede8d0a1832df0c2b083fd3",
       "changes": [
+        {
+          "version": "1.3.0",
+          "notes": [
+            "Holo Glow is now called GlowFX.",
+            "Glow layers you made before the rename still update when you click Apply again."
+          ]
+        },
         {
           "version": "1.2.4",
           "notes": [

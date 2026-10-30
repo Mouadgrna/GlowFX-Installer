@@ -1,4 +1,4 @@
-// Publishes plugins to the GlowFX Installer catalog.
+// Publishes plugins to the GlowFX catalog.
 //
 //   node publish/publish.js                      build packages + catalog.json (no push)
 //   node publish/publish.js --push -m "Notes"    ...and commit + push to GitHub
@@ -130,7 +130,7 @@ function main() {
   }
 
   // installer app
-  const exe = path.join(repo, 'installer', 'GlowFXInstaller.exe');
+  const exe = path.join(repo, 'installer', 'GlowFX.exe');
   const cs = fs.readFileSync(path.join(repo, 'app', 'GlowFXInstaller.cs'), 'utf8');
   const appVersion = (cs.match(/AppVersion\s*=\s*"([^"]+)"/) || [])[1];
   if (flag('--installer') || !fs.existsSync(exe)) {
@@ -138,7 +138,7 @@ function main() {
     execFileSync('powershell', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', path.join(repo, 'app', 'build.ps1')], { stdio: 'inherit' });
   }
   const appSource = contentHash(path.join(repo, 'app'), (f) => /\.(cs|xaml|ico)$/i.test(f));
-  const installer = { version: appVersion, url: 'installer/GlowFXInstaller.exe', sha256: sha256(exe), sourceHash: appSource };
+  const installer = { version: appVersion, url: 'installer/GlowFX.exe', sha256: sha256(exe), sourceHash: appSource };
   const prevInst = previous.installer;
   if (prevInst && prevInst.version === appVersion && prevInst.sourceHash && prevInst.sourceHash !== appSource) {
     warnings.push(`Installer: the app source changed but AppVersion is still ${appVersion}. Bump AppVersion in app/GlowFXInstaller.cs ` +
@@ -159,7 +159,7 @@ function main() {
     git('add', '-A');
     try { git('commit', '-m', msg); } catch (e) { console.log('  nothing new to commit'); }
     git('push', 'origin', 'HEAD:main');
-    console.log('Pushed. Users get it the next time they open GlowFX Installer (GitHub can take a few minutes to refresh).');
+    console.log('Pushed. Users get it the next time they open GlowFX (GitHub can take a few minutes to refresh).');
   }
 }
 

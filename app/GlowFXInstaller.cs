@@ -1,4 +1,4 @@
-// GlowFX Installer - one-click installer for GlowFX Photoshop plugins.
+// GlowFX - one-click installer for GlowFX Photoshop plugins.
 //
 // Reads catalog.json (from GitHub, or a local folder for testing), compares it with the
 // plugins Photoshop has installed, and installs / updates / uninstalls them through Adobe's
@@ -27,17 +27,17 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-[assembly: AssemblyTitle("GlowFX Installer")]
-[assembly: AssemblyProduct("GlowFX Installer")]
-[assembly: AssemblyVersion("1.0.2.0")]
-[assembly: AssemblyFileVersion("1.0.2.0")]
+[assembly: AssemblyTitle("GlowFX")]
+[assembly: AssemblyProduct("GlowFX")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.0.0")]
 
 namespace GlowFX
 {
     static class Config
     {
         // Bump this when publishing a new installer build (the publish script reads it).
-        public const string AppVersion = "1.0.2";
+        public const string AppVersion = "1.1.0";
         public const string DefaultCatalog = "https://raw.githubusercontent.com/Mouadgrna/GlowFX-Installer/main/catalog.json";
     }
 
@@ -547,7 +547,7 @@ namespace GlowFX
 
                 if (!string.IsNullOrEmpty(catalog.InstallerVersion) && Versions.Compare(catalog.InstallerVersion, Config.AppVersion) > 0)
                 {
-                    bannerText.Text = "A new version of GlowFX Installer is available (v" + catalog.InstallerVersion + ").";
+                    bannerText.Text = "A new version of GlowFX is available (v" + catalog.InstallerVersion + ").";
                     banner.Visibility = Visibility.Visible;
                 }
                 else banner.Visibility = Visibility.Collapsed;
@@ -580,7 +580,7 @@ namespace GlowFX
                 var r = MessageBox.Show(window,
                     "Photoshop is open.\n\nSave your work and close Photoshop so the " + action + " finishes cleanly, then click OK.\n\n" +
                     "Click No to continue anyway (the old version is cleaned up when you restart Photoshop).",
-                    "GlowFX Installer", MessageBoxButton.YesNoCancel, MessageBoxImage.Information, MessageBoxResult.Yes);
+                    "GlowFX", MessageBoxButton.YesNoCancel, MessageBoxImage.Information, MessageBoxResult.Yes);
                 if (r == MessageBoxResult.Cancel) return false;
                 if (r == MessageBoxResult.No) return true;
                 // Yes = "I closed it": loop and check again
@@ -597,7 +597,7 @@ namespace GlowFX
             if (agent == null)
             {
                 MessageBox.Show(window, "The Creative Cloud desktop app is needed to install Photoshop plugins.\nInstall it from adobe.com and try again.",
-                    "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "GlowFX", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
             if (!HandlePhotoshopOpen(todo.Any(t => t.IsInstalled) ? "update" : "install")) return;
@@ -677,7 +677,7 @@ namespace GlowFX
             {
                 Status(ok + " installed, " + failures.Count + " failed.");
                 MessageBox.Show(window, "Some plugins could not be installed:\n\n" + string.Join("\n", failures) + "\n\nDetails are in:\n" + Log.FilePath,
-                    "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    "GlowFX", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -716,7 +716,7 @@ namespace GlowFX
                 if (ScreenshotPath == null)
                     MessageBox.Show(window, "Could not uninstall " + item.Name + ":\n" + FirstLine(res.Value) +
                         "\n\nYou can also remove it from the Creative Cloud app (Stock & Marketplace > Plugins).\nDetails: " + Log.FilePath,
-                        "GlowFX Installer", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        "GlowFX", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -728,7 +728,7 @@ namespace GlowFX
             try
             {
                 Status("Downloading the new installer…");
-                var file = await Catalog.Fetch(catalog.InstallerUrl, "GlowFXInstaller-" + catalog.InstallerVersion + ".exe", catalog.InstallerSha,
+                var file = await Catalog.Fetch(catalog.InstallerUrl, "GlowFX-" + catalog.InstallerVersion + ".exe", catalog.InstallerSha,
                     pct => progress.Value = pct);
                 var current = Assembly.GetEntryAssembly().Location;
                 var script = Path.Combine(Path.GetTempPath(), "GlowFX", "update-installer.cmd");
@@ -781,7 +781,7 @@ namespace GlowFX
             app.DispatcherUnhandledException += (s, e) =>
             {
                 Log.Write("Unhandled: " + e.Exception);
-                MessageBox.Show("Something went wrong:\n" + e.Exception.Message + "\n\nDetails: " + Log.FilePath, "GlowFX Installer",
+                MessageBox.Show("Something went wrong:\n" + e.Exception.Message + "\n\nDetails: " + Log.FilePath, "GlowFX",
                     MessageBoxButton.OK, MessageBoxImage.Error);
                 e.Handled = true;
             };
@@ -792,7 +792,7 @@ namespace GlowFX
                 window = (Window)XamlReader.Load(s);
             using (var ico = asm.GetManifestResourceStream("app.ico"))
                 if (ico != null) window.Icon = BitmapFrame.Create(ico, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-            window.Title = "GlowFX Installer  v" + Config.AppVersion;
+            window.Title = "GlowFX  v" + Config.AppVersion;
 
             var controller = new MainController(window, catalog);
             if (shot != null)
