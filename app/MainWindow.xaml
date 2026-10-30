@@ -1,0 +1,175 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GlowFX Installer" Width="600" Height="680" MinWidth="480" MinHeight="420"
+        WindowStartupLocation="CenterScreen" Background="#17171B" Foreground="#ECECF1"
+        FontFamily="Segoe UI" FontSize="13" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+  <Window.Resources>
+    <SolidColorBrush x:Key="Accent" Color="#3B82F6"/>
+    <SolidColorBrush x:Key="AccentHover" Color="#5B97F8"/>
+    <SolidColorBrush x:Key="Card" Color="#222228"/>
+    <SolidColorBrush x:Key="CardBorder" Color="#2E2E36"/>
+    <SolidColorBrush x:Key="Muted" Color="#9A9AA6"/>
+
+    <Style x:Key="PrimaryButton" TargetType="Button">
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Background" Value="{StaticResource Accent}"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="Padding" Value="22,10"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="{StaticResource AccentHover}"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Opacity" Value="0.4"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="QuietButton" TargetType="Button">
+      <Setter Property="Foreground" Value="#C9C9D2"/>
+      <Setter Property="Background" Value="#2A2A31"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="b" Property="Background" Value="#34343D"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="b" Property="Opacity" Value="0.4"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="Check" TargetType="CheckBox">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <Border x:Name="box" Width="20" Height="20" CornerRadius="5" BorderThickness="1.5" BorderBrush="#5A5A66" Background="Transparent">
+              <Path x:Name="tick" Data="M 4.5 10 L 8.5 14 L 15.5 6" Stroke="White" StrokeThickness="2.2"
+                    StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Visibility="Collapsed"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="box" Property="Background" Value="{StaticResource Accent}"/>
+                <Setter TargetName="box" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                <Setter TargetName="tick" Property="Visibility" Value="Visible"/>
+              </Trigger>
+              <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="box" Property="BorderBrush" Value="#8A8A96"/></Trigger>
+              <Trigger Property="IsEnabled" Value="False"><Setter TargetName="box" Property="Opacity" Value="0.35"/></Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+  </Window.Resources>
+
+  <Grid Margin="24,20,24,20">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!-- header -->
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <StackPanel>
+        <TextBlock Text="GlowFX" FontSize="26" FontWeight="Bold"/>
+        <TextBlock Text="Photoshop plugins, installed in one click" Foreground="{StaticResource Muted}" Margin="0,2,0,0"/>
+      </StackPanel>
+      <Button x:Name="RefreshButton" Content="↻  Refresh" Style="{StaticResource QuietButton}"
+              HorizontalAlignment="Right" VerticalAlignment="Top"/>
+    </Grid>
+
+    <!-- installer self-update banner -->
+    <Border x:Name="UpdateBanner" Grid.Row="1" Background="#1E2A44" BorderBrush="#2F4A7A" BorderThickness="1"
+            CornerRadius="8" Padding="14,10" Margin="0,0,0,14" Visibility="Collapsed">
+      <DockPanel>
+        <Button x:Name="UpdateAppButton" DockPanel.Dock="Right" Content="Update now" Style="{StaticResource QuietButton}"/>
+        <TextBlock x:Name="UpdateBannerText" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+      </DockPanel>
+    </Border>
+
+    <!-- plugin list -->
+    <Grid Grid.Row="2">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl x:Name="PluginList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Background="{StaticResource Card}" BorderBrush="{StaticResource CardBorder}" BorderThickness="1"
+                      CornerRadius="10" Padding="16,14" Margin="0,0,0,10">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <CheckBox Grid.Column="0" Style="{StaticResource Check}" VerticalAlignment="Center" Margin="0,0,14,0"
+                            IsChecked="{Binding IsChecked, Mode=TwoWay}" IsEnabled="{Binding CanSelect}"/>
+                  <Border Grid.Column="1" Width="52" Height="52" CornerRadius="10" Background="#141418" Margin="0,0,14,0" VerticalAlignment="Top">
+                    <Image Source="{Binding Icon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality"/>
+                  </Border>
+                  <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{Binding Name}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                      <Border x:Name="badge" CornerRadius="9" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center" Background="#2A2A31">
+                        <TextBlock x:Name="badgeText" Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="#C9C9D2"/>
+                      </Border>
+                    </StackPanel>
+                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="{StaticResource Muted}" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding VersionLine}" FontSize="11" Foreground="#73737F" Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding ProgressText}" FontSize="12" Foreground="#8FB4FF" Margin="0,4,0,0"
+                               Visibility="{Binding ProgressVisibility}"/>
+                  </StackPanel>
+                  <Button Grid.Column="3" Tag="uninstall" Content="Uninstall" Style="{StaticResource QuietButton}"
+                          VerticalAlignment="Center" Margin="12,0,0,0" Visibility="{Binding UninstallVisibility}"/>
+                </Grid>
+              </Border>
+              <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding StatusKind}" Value="installed">
+                  <Setter TargetName="badge" Property="Background" Value="#183A2A"/>
+                  <Setter TargetName="badgeText" Property="Foreground" Value="#6BD99A"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusKind}" Value="update">
+                  <Setter TargetName="badge" Property="Background" Value="#3D3216"/>
+                  <Setter TargetName="badgeText" Property="Foreground" Value="#F2C14E"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding StatusKind}" Value="error">
+                  <Setter TargetName="badge" Property="Background" Value="#3D1C1C"/>
+                  <Setter TargetName="badgeText" Property="Foreground" Value="#FF8080"/>
+                </DataTrigger>
+              </DataTemplate.Triggers>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      <TextBlock x:Name="EmptyText" Text="Loading plugins…" Foreground="{StaticResource Muted}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap"/>
+    </Grid>
+
+    <!-- footer -->
+    <StackPanel Grid.Row="3" Margin="0,14,0,0">
+      <ProgressBar x:Name="Progress" Height="4" Minimum="0" Maximum="100" Value="0" Foreground="{StaticResource Accent}"
+                   Background="#2A2A31" BorderThickness="0" Margin="0,0,0,12" Visibility="Hidden"/>
+      <DockPanel>
+        <Button x:Name="InstallButton" DockPanel.Dock="Right" Content="Install selected" Style="{StaticResource PrimaryButton}"/>
+        <TextBlock x:Name="StatusText" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="{StaticResource Muted}" Margin="0,0,16,0"/>
+      </DockPanel>
+    </StackPanel>
+  </Grid>
+</Window>

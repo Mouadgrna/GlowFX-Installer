@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "name": "GlowFX",
+  "updated": "2026-10-30T11:37:08.596Z",
+  "installer": {
+    "version": "1.0.0",
+    "url": "installer/GlowFXInstaller.exe",
+    "sha256": "60e51ae96f8d197ff8da4ab183c3cdde2aa8c1674aabe4c519a017ecf24040b3",
+    "sourceHash": "37a363e433251cce475c8732408754cb278ff068a9e203f409ec7f2774d871b2"
+  },
+  "plugins": [
+    {
+      "id": "com.mouadgrna.hologlow",
+      "name": "Holo Glow",
+      "version": "1.2.1",
+      "description": "One-click procedural holographic glow for items and logos: rainbow rays, lens flares, star sparkles and halo rings that follow the item's shape.",
+      "minPhotoshop": "25.0.0",
+      "package": "plugins/hologlow/HoloGlow-1.2.1.ccx",
+      "sha256": "74874ea7a09011a684c5592e1297b846e9dcb0b479f0181f81b7243f49c98e75",
+      "size": 28609,
+      "icon": "plugins/hologlow/icon.png",
+      "sourceHash": "e4c843fe2cb6ec443be6e249d1b024863548e89b0145eaf13e189fab1cb6ce19"
+    }
+  ]
+}
